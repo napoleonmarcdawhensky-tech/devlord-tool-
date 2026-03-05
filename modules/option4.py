@@ -1,29 +1,29 @@
-#!/bin/bash
+import os
+import random
+import time
 
-# Demander au utilisateur de saisir le numéro de téléphone à cibler
-echo "Saisir le numéro de téléphone à cibler : "
-read num
+def generer_num():
+    return ''.join(random.choice('0123456789') for _ in range(10))
 
-# Fonction pour générer des numéros de téléphone faux
-function generer_num {
-  echo $(echo "1234567890" | fold -w 2 | shuf -e)
-}
+def envoyer_message(num):
+    message = "Ceci est un message automatique"
+    os.system(f"adb shell am broadcast -a android.intent.action.SEND -d 'sms:{num}' -e 'sms_body' '{message}'")
 
-# Fonction pour envoyer des messages en masse
-function envoyer_message {
-  num=$(generer_num)
-  message="Ceci est un message automatique"
-  adb shell am broadcast -a android.intent.action.SEND -d "sms:$num" -e "sms_body" "$message"
-}
+def main():
+    # Demander au utilisateur de saisir le numéro de téléphone à cibler
+    num = input("Saisir le numéro de téléphone à cibler : ")
 
-# Boucle pour envoyer des messages en masse
-for ((i=0; i<10000; i++)); do
-  # Envoyer le message ciblé au numéro précisé
-  message="Vous êtes ciblés !"
-  adb shell am broadcast -a android.intent.action.SEND -d "sms:$num" -e "sms_body" "$message"
-  echo "Message ciblé envoyé à $num"
+    # Boucle pour envoyer des messages en masse
+    for i in range(10000):
+        # Envoyer le message ciblé au numéro précisé
+        message = "Vous êtes ciblés !"
+        os.system(f"adb shell am broadcast -a android.intent.action.SEND -d 'sms:{num}' -e 'sms_body' '{message}'")
+        print(f"Message ciblé envoyé à {num}")
 
-  # Ensuite, spamme avec les numéros générés
-  envoyer_message
-  sleep 0.01
-done
+        # Ensuite, spamme avec les numéros générés
+        num_genere = generer_num()
+        envoyer_message(num_genere)
+        time.sleep(0.01)
+
+if __name__ == "__main__":
+    main()
